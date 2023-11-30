@@ -1,0 +1,12 @@
+{
+  "name": "parse-readme",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "split": "node ./split-readme.js",
+    "join": "node ./join-readme.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
