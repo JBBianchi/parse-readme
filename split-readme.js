@@ -14,6 +14,7 @@ const kebabCase = (source) => {
     .replace(/-+/g, '-')
     .toLowerCase();
 };
+const knownExamples = [];
 
 (async () => {  
   try {
@@ -28,11 +29,26 @@ const kebabCase = (source) => {
     const title = block.split('\n')[0];
     const examples = block.match(extractor);
     if (examples) {
-      const fileName = kebabCase(title.toLowerCase().replace('example', '').trim());
-      await fs.promises.writeFile(path.resolve(outputPath, fileName + '.json'), examples[1], { encoding: 'utf8', flag: 'w' });
-      await fs.promises.writeFile(path.resolve(outputPath, fileName + '.yml'), examples[2], { encoding: 'utf8', flag: 'w' });
-      block = block.replace(examples[1], `<include file="${fileName}.json" />`);
-      block = block.replace(examples[2], `<include file="${fileName}.yml" />`);
+      const json = examples[1];
+      try {
+        const workflow = JSON.parse(json);
+        const fileName = workflow.id.toLowerCase();
+        const prettyFileName = kebabCase(title.toLowerCase().replace('example', '').trim());
+        if (knownExamples.includes(fileName)) {
+          const count = knownExamples.filter(example => example.startsWith(fileName)).length;
+          fileName += `-${count}`;
+        }
+        await fs.promises.writeFile(path.resolve(outputPath, fileName + '.json'), json, { encoding: 'utf8', flag: 'w' });
+        //await fs.promises.writeFile(path.resolve(outputPath, fileName + '.yml'), examples[2], { encoding: 'utf8', flag: 'w' });
+        block = block.replace(examples[1], `<include file="${prettyFileName}.json" format="json" />`);
+        block = block.replace(examples[2], `<include file="${prettyFileName}.json" format="yaml" />`);
+        knownExamples.push(fileName);
+      }
+      catch (ex) 
+      {
+        console.error('Failed to parse JSON ', json);
+        console.error(ex);
+      }
     }
     readMe += isFirst ? block : `${newSection}${block}`;
     isFirst = false;

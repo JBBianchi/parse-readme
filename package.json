@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "split": "node ./split-readme.js",
+    "rename": "node ./rename-readme.js",
     "join": "node ./join-readme.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "yaml": "^2.3.4"
+  }
 }
